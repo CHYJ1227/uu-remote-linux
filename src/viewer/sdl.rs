@@ -8,7 +8,10 @@ impl Window {
     pub fn new()->Result<Self,String>{
         let sdl=sdl2::init()?;let video=sdl.video()?;
         let window=video.window("Native viewer (experimental)",1280,720).position_centered().resizable().build().map_err(|_|"Window creation failed")?;
-        let canvas=window.into_canvas().build().map_err(|_|"Renderer creation failed")?;
+        let mut canvas=window.into_canvas().build().map_err(|_|"Renderer creation failed")?;
+        // Wayland maps a toplevel only after its first buffer; without this the window stays
+        // invisible until the first decoded frame, which a stalled stream never delivers.
+        canvas.set_draw_color(sdl2::pixels::Color::BLACK);canvas.clear();canvas.present();
         let events=sdl.event_pump()?;let clipboard=video.clipboard();
         let(clipboard_tx,clipboard_requests)=tokio::sync::mpsc::channel(16);
         Ok(Self{canvas,events,_sdl:sdl,frame:(1920,1080),focused:true,files:false,mac:false,clipboard,clipboard_dirty:true,clipboard_tx,clipboard_requests,last_frame:None})
@@ -50,7 +53,7 @@ impl Window {
             log::debug!("Viewer window resized: {:?}",self.canvas.window().size());
             if let Err(e)=self.draw(&frame){log::warn!("Viewer redraw failed: {e}");}
             self.last_frame=Some(frame);
-        }}
+        }else{self.canvas.set_draw_color(sdl2::pixels::Color::BLACK);self.canvas.clear();self.canvas.present();}}
         result
     }
     fn draw(&mut self,frame:&Frame)->Result<(),String>{
