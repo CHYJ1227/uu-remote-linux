@@ -74,6 +74,8 @@ webrtc-srtp = { path = "vendor/webrtc-srtp" }
 webrtc-dtls = { path = "vendor/webrtc-dtls" }
 # Larger data-channel receive buffer (see vendor/webrtc/src/data_channel/mod.rs).
 webrtc = { path = "vendor/webrtc" }
+# TURN over TCP/TLS through an HTTP CONNECT proxy (vendor/webrtc-ice/PATCHES.md).
+webrtc-ice = { path = "vendor/webrtc-ice" }
 
 [[bench]]
 name = "nvenc_pipeline_bench"

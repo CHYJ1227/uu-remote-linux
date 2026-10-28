@@ -3010,8 +3010,6 @@ dependencies = [
 [[package]]
 name = "webrtc-ice"
 version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1bbd6b3dea22cc6e961e22b012e843d8869e2ac8e76b96e54d4a25e311857ad"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -3023,10 +3021,12 @@ dependencies = [
  "stun",
  "thiserror 1.0.69",
  "tokio",
+ "tokio-rustls",
  "turn",
  "url",
  "uuid",
  "waitgroup",
+ "webpki-roots 1.0.9",
  "webrtc-mdns",
  "webrtc-util",
 ]
