@@ -147,9 +147,22 @@ pub async fn run() -> Result<(), String> {
         Err(_) => line("config mode", "missing (run `uuremote-server login`)"),
     }
     line("service", command_output("systemctl", &["--user", "is-active", "uuremote-native.service"]).await.unwrap_or_else(|| "systemctl unavailable".into()));
-    let running = command_output("pgrep", &["-c", "-x", "uuremote-server"]).await.filter(|n| !n.is_empty()).unwrap_or_else(|| "unknown".into());
+    let running = host_processes().map_or_else(|| "unknown".into(), |n| n.to_string());
     line("uuremote-server procs", format!("{running} (including this one; more than 2 means duplicates)"));
     Ok(())
+}
+
+/// Hosts re-exec through /proc/self/exe (comm "exe"), so match the executable's file name, not the process name.
+fn host_processes() -> Option<usize> {
+    let count = std::fs::read_dir("/proc").ok()?.flatten()
+        .filter(|entry| entry.file_name().to_str().is_some_and(|name| name.bytes().all(|c| c.is_ascii_digit())))
+        .filter_map(|entry| std::fs::read_link(entry.path().join("exe")).ok())
+        .filter(|exe| is_host_executable(exe)).count();
+    Some(count)
+}
+
+fn is_host_executable(exe: &std::path::Path) -> bool {
+    exe.file_name().and_then(|name| name.to_str()).is_some_and(|name| name.trim_end_matches(" (deleted)") == "uuremote-server")
 }
 
 #[cfg(test)]
@@ -173,5 +186,16 @@ mod tests {
         // Another backend, or a headless host: not this warning.
         assert!(!super::missing_display(DesktopBackend::Wayland, false, None, None));
         assert!(!super::missing_display(DesktopBackend::X11, true, None, None));
+    }
+
+    #[test]
+    fn host_processes_match_the_executable_even_after_reexec() {
+        use std::path::Path;
+        for exe in ["/usr/bin/uuremote-server", "/home/u/.local/bin/uuremote-server", "/usr/bin/uuremote-server (deleted)"] {
+            assert!(super::is_host_executable(Path::new(exe)));
+        }
+        for exe in ["/usr/bin/uuremote-viewer", "/usr/bin/bash", "/usr/bin/uuremote-server-old"] {
+            assert!(!super::is_host_executable(Path::new(exe)));
+        }
     }
 }
