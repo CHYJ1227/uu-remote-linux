@@ -469,6 +469,7 @@ impl SignalingClient {
                                             log::info!("Cloud peer event: generation={} event={} age_s={} pings={} last_ping_gap_s={} ice_id_present={}",generation,event_name,started.elapsed().as_secs(),pings,last_ping.elapsed().as_secs(),data.get("ice_id").is_some());
                                             let ice_id = data.get("ice_id").and_then(|v| v.as_str()).unwrap_or("");
                                             if ice_id.is_empty() {
+                                                log::info!("Cloud room leave shape: {}", crate::protocol::json_shape(data, 3));
                                                 log::warn!("Cloud room leave without peer identifier; renewing signaling (expiry cause unknown)");
                                                 if !send_event(&event_sender, SignalingEvent::Disconnected).await { break; }
                                             } else {
