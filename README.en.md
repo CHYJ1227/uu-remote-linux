@@ -214,6 +214,8 @@ machine, in `~/.config/uuremote/config.json` (mode 0600).
 
 A failed status query or the 60-second request timeout does not prove that the QR expired or that the phone confirmed login. The official-client refresh policy is unchanged: after a query error, click Refresh QR (Enter in a terminal; refresh after 60 seconds with neither a window nor a terminal). QR request diagnostics contain only the request phase, error category, elapsed time, HTTP/API status and last known scan state—not tickets, URLs or response content. A `connect` category alone does not identify a DNS, TLS or proxy cause.
 
+The same file holds this machine's device identity (`device_id`, `client_id`, `system_id`), which reinstalls and new QR logins keep. **Do not copy `config.json` between machines or clone a second host from a snapshot/disk that includes the home directory**: two host instances with one identity, on the same or different machines, kick each other out of the room. The log then shows `Cloud room leave without peer identifier` every few seconds with reconnects, and viewers disconnect right after connecting. On a cloned or copied machine, stop the service, remove those three keys plus `token`, `csrf` and `user_id`, and run `uuremote-server login` to register a new device. A leftover instance on the same machine (for example an old `~/.local/bin/uuremote-server` started by hand) has the same effect; `uuremote-server doctor` warns when more than one host instance is running.
+
 ### 4. Run as a user service
 
 `~/.config/systemd/user/uuremote-native.service`:

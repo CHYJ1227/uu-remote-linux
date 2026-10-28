@@ -197,6 +197,8 @@ cargo build --release --features wayland,portal   # + GNOME/KDE Wayland
 
 登录状态查询失败或达到 60 秒请求超时不代表二维码已过期，也不代表手机已经确认。程序保留官方客户端的刷新策略：查询出错后点击「刷新二维码」（终端按回车；无窗口且无终端时 60 秒后刷新）。二维码请求诊断只包含请求阶段、错误类别、耗时、HTTP/API 状态及最后已知扫码状态，不输出票据、URL 或响应内容；`connect` 类别本身不能确定是 DNS、TLS 还是代理问题。
 
+这个文件里还有本机的设备身份（`device_id`、`client_id`、`system_id`），重装软件和重新扫码登录都会沿用它。**不要在机器之间拷贝 `config.json`，也不要从带着家目录的快照/数据盘克隆出第二台主机**：同一身份的两个主机实例（不论在同一台还是不同机器上）会互相把对方踢出房间，日志表现为每隔几秒出现 `Cloud room leave without peer identifier` 并反复重连，控制端一连就断。克隆或拷贝出来的机器先停掉服务，删掉配置里这三个键和 `token`、`csrf`、`user_id`，再运行 `uuremote-server login` 注册为新设备。同一台机器上残留的旧实例（例如以前手动启动的 `~/.local/bin/uuremote-server`）也会这样，`uuremote-server doctor` 发现多个主机实例时会提示。
+
 ### 4. 作为用户服务常驻
 
 `~/.config/systemd/user/uuremote-native.service`：
