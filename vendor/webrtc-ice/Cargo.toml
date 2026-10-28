@@ -45,6 +45,9 @@ package = "webrtc-mdns"
 [dependencies.rand]
 version = "0.8"
 
+[dependencies.rustls-native-certs]
+version = "0.8"
+
 [dependencies.serde]
 version = "1"
 features = ["derive"]

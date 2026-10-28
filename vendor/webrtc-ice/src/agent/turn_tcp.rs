@@ -86,7 +86,10 @@ async fn tls_connect(tcp: TcpStream, host: &str)
     -> Result<tokio_rustls::client::TlsStream<TcpStream>, String> {
     use tokio_rustls::rustls::{self, client::WebPkiServerVerifier, pki_types::ServerName};
     let provider = Arc::new(rustls::crypto::ring::default_provider());
+    // System store first (it holds any CA the host's administrator added, e.g. for a TLS-inspecting
+    // proxy, as OpenSSL would use), then the bundled Mozilla roots.
     let mut roots = rustls::RootCertStore::empty();
+    roots.add_parsable_certificates(rustls_native_certs::load_native_certs().certs);
     roots.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
     let inner = WebPkiServerVerifier::builder_with_provider(Arc::new(roots), provider.clone()).build()
         .map_err(|e| format!("TURN TLS setup: {e}"))?;

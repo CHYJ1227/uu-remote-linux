@@ -11,3 +11,6 @@ the TURN servers but whose TCP goes through an HTTP proxy.
 application with `set_relay_transport`), adds TLS for `turns:`, and exposes the stream to the
 unchanged `turn` client as datagrams: one STUN message or ChannelData frame (with its 4-byte TCP
 padding) per read. `agent_gather.rs` uses it for `ProtoType::Tcp` URLs. UDP gathering is unchanged.
+
+TLS trusts the system certificate store (`rustls-native-certs`, as OpenSSL does) plus the bundled
+Mozilla roots. A name mismatch is accepted only when the TURN URL is an IP literal.
