@@ -19,6 +19,21 @@
 <p align="center"><img src="docs/images/main-window.png" width="620" alt="Linux 主机主窗口：远程协助与账号"></p>
 <p align="center"><sub>Linux 被控端主窗口：远程协助与账号（设备 ID、验证码和账号已打码）</sub></p>
 
+## 语言 / Language
+
+启动时按以下顺序确定界面语言：
+
+1. `UU_LANG=zh` 或 `UU_LANG=en`；
+2. 控制端 **设置 → 常规 → 语言 / Language** 或主机主窗口底部「语言 / Language」中保存的选择（保存在 `~/.config/uuremote/language`，重启后生效）；
+3. 系统区域设置：`LC_ALL` / `LC_MESSAGES` / `LANG` 以 `zh` 开头为中文，其余为英文。
+
+```sh
+UU_LANG=zh uuremote-viewer ui
+UU_LANG=en uuremote-server
+```
+
+协议字段以及 UU 服务器返回的提示按服务器原文显示。
+
 <!-- 截图占位：在官方客户端里远控 Linux 桌面的效果图。请自行截图并去掉账号、设备名等信息后放到
      docs/images/remote-desktop.png，再取消下面这行的注释。注意不要截入网易的图标和品牌素材。 -->
 <!-- <p align="center"><img src="docs/images/remote-desktop.png" width="720" alt="用官方 Mac 客户端远控 Linux 桌面"></p> -->
@@ -527,6 +542,7 @@ GNOME 与官方 Mac 被控端的双向剪贴板尚未验证通过；此修改不
 - 桌面同时提供 H.264 / H.265，由主机协商选择；`UU_VIEWER_CODEC=h264` 将 SDP 和解码能力限制为 H.264。
   默认请求 4:2:0；`UU_VIEWER_CHROMA=444` 在 CONTROL 打开后请求真彩（4:4:4）。主机可能回落到 4:2:0，
   以 CaptureSettingSync 回报为准。两种色度均由 FFmpeg 转为 RGB24 显示。
+- 按被控端原始分辨率解码，窗口缩放使用线性过滤；被控端分辨率变化时自动重启解码器。`UU_VIEWER_SIZE=WxH` 可改为固定的留黑边画布。
 
 Mac 目标使用 macOS 原生键码，Windows / Linux 目标保留 Windows VK。键盘按物理键位置转发，不自动把 Ctrl 改成 Command；
 控制 Mac 时，PC 键盘的 Super / Win 键对应 Command。仅接受已验证的目标平台值 1（Windows / 本项目 Linux 主机）和 4（Mac），
